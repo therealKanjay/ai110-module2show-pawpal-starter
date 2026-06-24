@@ -1,15 +1,102 @@
 classDiagram
-    %% Replace the placeholders below with your actual classes, attributes, methods, and relationships.
-    %% Keep this file updated so it matches your final implementation.
-
-    class ClassName {
-        +type attribute
-        +method() returnType
+    %% Data Models
+    class Pet {
+        +String name
+        +String gender
+        +Float bodyWeight
+        +String petType
+        +LocalDate dateAdded
     }
 
-    class AnotherClass {
-        +type attribute
-        +method() returnType
+    class Task {
+        +String taskId
+        +String description
+        +String taskType
+        +Int priority
+        +LocalDate dueDate
+        +Int estimatedDuration
     }
 
-    ClassName --> AnotherClass : relationship
+    class Weather {
+        +String condition
+        +Float temperature
+        +String recommendation
+    }
+
+    class Walk {
+        +String walkId
+        +LocalDateTime scheduledTime
+        +Float durationMinutes
+        +String weatherCondition
+    }
+
+    class Owner {
+        +String name
+        +String email
+        +List~String~ preferences
+    }
+
+    %% Manager/Handler Classes
+    class PetManager {
+        -List~Pet~ registeredPets
+        +addPet(name, gender, weight, petType) void
+        +removePet(petId) void
+        +getPetInfo(petId) Pet
+        +listAllPets() List~Pet~
+    }
+
+    class WalkScheduler {
+        -Weather currentWeather
+        +scheduleWalk(pet, weather) Walk
+        +setWalkTimestamp(walkId, dateTime) void
+        +getPetWalkSchedule(petId) List~Walk~
+    }
+
+    class TaskManager {
+        -List~Task~ allTasks
+        +addTask(description, type, priority, dueDate) void
+        +getTodaysTasks() List~Task~
+        +displayTodaysTasks() void
+        +completeTask(taskId) void
+    }
+
+    class PlanGenerator {
+        -List~Pet~ pets
+        -List~Task~ tasks
+        -Map~String, String~ constraints
+        -Map~String, Int~ priorities
+        +generatePlan(constraints, priorities) ActivityPlan
+        +optimizeSchedule() void
+        +explainPlanChoices() String
+    }
+
+    class ActivityPlan {
+        +String planId
+        +LocalDate planDate
+        +List~ScheduledActivity~ activities
+        +String explanation
+    }
+
+    class ScheduledActivity {
+        +String activityId
+        +LocalDateTime startTime
+        +LocalDateTime endTime
+        +String activityType
+        +Pet associatedPet
+        +Task associatedTask
+    }
+
+    %% Relationships
+    PetManager --> Pet : manages
+    WalkScheduler --> Pet : schedules for
+    WalkScheduler --> Weather : uses
+    WalkScheduler --> Walk : creates
+    TaskManager --> Task : manages
+    PlanGenerator --> Pet : uses
+    PlanGenerator --> Task : uses
+    PlanGenerator --> ActivityPlan : generates
+    ActivityPlan --> ScheduledActivity : contains
+    ScheduledActivity --> Pet : references
+    ScheduledActivity --> Task : references
+    PetManager --> Owner : belongs to
+    TaskManager --> Owner : belongs to
