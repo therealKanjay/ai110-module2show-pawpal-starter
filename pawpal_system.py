@@ -20,14 +20,26 @@ class Pet:
         dateAdded: Optional[date] = None,
         petId: Optional[str] = None,
     ):
+        """Initialize a new pet with the provided details."""
         self.petId: str = petId or str(uuid4())
         self.name: str = name
         self.gender: str = gender
         self.bodyWeight: float = bodyWeight
         self.petType: str = petType
         self.dateAdded: date = dateAdded or date.today()
+        self.tasks: List[Task] = []
+
+    @property
+    def task_count(self) -> int:
+        """Return the number of tasks assigned to the pet."""
+        return len(self.tasks)
+
+    def add_task(self, task: "Task") -> None:
+        """Add a task to the pet's task list."""
+        self.tasks.append(task)
 
     def to_dict(self) -> Dict[str, Any]:
+        """Convert the pet into a serializable dictionary."""
         return {
             "petId": self.petId,
             "name": self.name,
@@ -39,6 +51,7 @@ class Pet:
 
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "Pet":
+        """Create a pet from a dictionary payload."""
         return Pet(
             name=data["name"],
             gender=data["gender"],
@@ -62,6 +75,7 @@ class Task:
         taskId: Optional[str] = None,
         createdAt: Optional[date] = None,
     ):
+        """Initialize a new task with the supplied schedule details."""
         self.taskId: str = taskId or str(uuid4())
         self.description: str = description
         self.taskType: str = taskType
@@ -72,6 +86,7 @@ class Task:
         self.createdAt: date = createdAt or date.today()
 
     def to_dict(self) -> Dict[str, Any]:
+        """Convert the task into a serializable dictionary."""
         return {
             "taskId": self.taskId,
             "description": self.description,
@@ -83,8 +98,13 @@ class Task:
             "createdAt": self.createdAt.isoformat(),
         }
 
+    def mark_complete(self) -> None:
+        """Mark the task as completed."""
+        self.completed = True
+
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "Task":
+        """Create a task from a dictionary payload."""
         task = Task(
             description=data["description"],
             taskType=data["taskType"],
@@ -102,6 +122,7 @@ class Weather:
     """Represents weather information."""
     
     def __init__(self, condition: str, temperature: float, recommendation: str):
+        """Initialize weather details for a walk schedule."""
         self.condition: str = condition
         self.temperature: float = temperature
         self.recommendation: str = recommendation
@@ -111,12 +132,14 @@ class Walk:
     """Represents a scheduled walk."""
     
     def __init__(self, walkId: str, scheduledTime: datetime, durationMinutes: float, weatherCondition: str):
+        """Initialize a walk schedule entry."""
         self.walkId: str = walkId
         self.scheduledTime: datetime = scheduledTime
         self.durationMinutes: float = durationMinutes
         self.weatherCondition: str = weatherCondition
 
     def to_dict(self) -> Dict[str, Any]:
+        """Convert the walk into a serializable dictionary."""
         return {
             "walkId": self.walkId,
             "scheduledTime": self.scheduledTime.isoformat(),
@@ -126,6 +149,7 @@ class Walk:
 
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "Walk":
+        """Create a walk from a dictionary payload."""
         return Walk(
             walkId=data["walkId"],
             scheduledTime=datetime.fromisoformat(data["scheduledTime"]),
@@ -144,12 +168,14 @@ class Owner:
         preferences: List[str],
         ownerId: Optional[str] = None,
     ):
+        """Initialize a pet owner profile."""
         self.ownerId: str = ownerId or str(uuid4())
         self.name: str = name
         self.email: str = email
         self.preferences: List[str] = preferences
 
     def to_dict(self) -> Dict[str, Any]:
+        """Convert the owner into a serializable dictionary."""
         return {
             "ownerId": self.ownerId,
             "name": self.name,
@@ -159,6 +185,7 @@ class Owner:
 
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "Owner":
+        """Create an owner from a dictionary payload."""
         return Owner(
             name=data["name"],
             email=data["email"],
@@ -175,6 +202,7 @@ class PetManager:
     """Manages pet registration and information."""
     
     def __init__(self):
+        """Initialize an empty pet registry."""
         self._registeredPets: Dict[str, Pet] = {}
     
     def addPet(self, name: str, gender: str, weight: float, petType: str) -> Pet:
@@ -213,6 +241,7 @@ class WalkScheduler:
     """Schedules walks for pets considering weather."""
     
     def __init__(self):
+        """Initialize an empty walk scheduler."""
         self._currentWeather: Optional[Weather] = None
         self._petSchedules: Dict[str, List[Walk]] = {}
     
@@ -268,6 +297,7 @@ class TaskManager:
     """Manages tasks and daily task scheduling."""
     
     def __init__(self):
+        """Initialize an empty task manager."""
         self._allTasks: Dict[str, Task] = {}
     
     def addTask(self, description: str, task_type: str, priority: int, dueDate: date, estimatedDuration: int = 0) -> Task:
@@ -328,6 +358,7 @@ class ScheduledActivity:
     """Represents a scheduled activity in the plan."""
     
     def __init__(self, activityId: str, startTime: datetime, endTime: datetime, activityType: str, associatedPet: Pet, associatedTask: Task):
+        """Initialize a scheduled activity entry."""
         self.activityId: str = activityId
         self.startTime: datetime = startTime
         self.endTime: datetime = endTime
@@ -336,6 +367,7 @@ class ScheduledActivity:
         self.associatedTask: Task = associatedTask
 
     def to_dict(self) -> Dict[str, Any]:
+        """Convert the activity into a serializable dictionary."""
         return {
             "activityId": self.activityId,
             "startTime": self.startTime.isoformat(),
@@ -347,6 +379,7 @@ class ScheduledActivity:
 
     @staticmethod
     def from_dict(data: Dict[str, Any], pets_by_id: Dict[str, Pet], tasks_by_id: Dict[str, Task]) -> "ScheduledActivity":
+        """Recreate a scheduled activity from stored data."""
         pet = pets_by_id.get(data["associatedPetId"])
         task = tasks_by_id.get(data["associatedTaskId"])
         if pet is None or task is None:
@@ -365,12 +398,14 @@ class ActivityPlan:
     """Represents a complete activity plan for a day."""
     
     def __init__(self, planId: str, planDate: date, activities: List[ScheduledActivity], explanation: str):
+        """Initialize an activity plan for a specific date."""
         self.planId: str = planId
         self.planDate: date = planDate
         self.activities: List[ScheduledActivity] = activities
         self.explanation: str = explanation
 
     def to_dict(self) -> Dict[str, Any]:
+        """Convert the plan into a serializable dictionary."""
         return {
             "planId": self.planId,
             "planDate": self.planDate.isoformat(),
@@ -384,6 +419,7 @@ class ActivityPlan:
         pets_by_id: Dict[str, Pet],
         tasks_by_id: Dict[str, Task],
     ) -> "ActivityPlan":
+        """Recreate an activity plan from stored data."""
         activities = [
             ScheduledActivity.from_dict(item, pets_by_id, tasks_by_id)
             for item in data["activities"]
@@ -400,6 +436,7 @@ class PlanGenerator:
     """Generates optimized activity plans for pet care."""
     
     def __init__(self, pets: Optional[List[Pet]] = None, tasks: Optional[List[Task]] = None):
+        """Initialize a plan generator with optional pet and task lists."""
         self._pets: List[Pet] = pets or []
         self._tasks: List[Task] = tasks or []
         self._constraints: Dict[str, str] = {}
@@ -489,6 +526,7 @@ class PlanGenerator:
         )
 
     def _build_effective_task_list(self) -> List[Task]:
+        """Build and sort the list of tasks that should be scheduled."""
         task_map: Dict[str, Task] = {task.taskId: task for task in self._tasks}
         for task_id, priority in self._priorities.items():
             if task_id in task_map:
@@ -501,6 +539,7 @@ class PlanGenerator:
         )
 
     def _parse_start_time(self, time_string: Optional[str], shift_days: int = 0) -> datetime:
+        """Parse a start time constraint into a datetime."""
         if time_string:
             try:
                 hours, minutes = map(int, time_string.split(":"))
@@ -511,6 +550,7 @@ class PlanGenerator:
         return datetime.combine(date.today() + timedelta(days=shift_days), time(hour=9, minute=0))
 
     def _parse_end_time(self, time_string: Optional[str]) -> Optional[datetime]:
+        """Parse an end time constraint into a datetime."""
         if time_string:
             try:
                 hours, minutes = map(int, time_string.split(".")) if "." in time_string else map(int, time_string.split(":"))
@@ -532,6 +572,7 @@ class PersistenceManager:
         owners: Optional[List[Owner]] = None,
         plans: Optional[List[ActivityPlan]] = None,
     ) -> None:
+        """Persist the current application state to a JSON file."""
         owners = owners or []
         plans = plans or []
         state = {
@@ -546,6 +587,7 @@ class PersistenceManager:
 
     @staticmethod
     def load_state(file_path: str, load_plans: bool = False) -> Dict[str, Any]:
+        """Load persisted application state from a JSON file."""
         with open(file_path, "r", encoding="utf-8") as handle:
             data = json.load(handle)
 
