@@ -39,10 +39,16 @@ pip install -r requirements.txt
 python -m pytest -q
 ```
 
-Sample output:
+### Sample output
 
-```bash
-3 passed
+Running the demo script prints a simple daily schedule like this:
+
+```text
+Today's Schedule
+Owner: Alex
+- 08:00 | Milo | Feed Milo breakfast
+- 12:30 | Buddy | Take Buddy for a walk
+- 19:00 | Milo | Play with Milo
 ```
 
 ## Usage notes
