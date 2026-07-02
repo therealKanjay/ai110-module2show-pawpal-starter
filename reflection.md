@@ -5,7 +5,27 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+    My initial design has 4 classes, first one adds a pet that basically does what it says.
+    It looks up already registered pets so it doesn't accidently duplicates, and then
+    asks for general & specific questions about the pet.
+    Schedule a walk lets you schedule a walk with any pet of your choosing.
+    It adds a timestamp to your schedule where it decided that on that time is the best to walk your pet
+    See today's tasks lets you see the tasks that are due today
+    Generating a plan based on constraints & priorities allows you to create 
+    a whole new plan that is based on the constraints & preferences that you've laid out
 - What classes did you include, and what responsibilities did you assign to each?
+    -Add a pet
+        Attributes: already registered pets, every recorded animal information
+        Methods: Add a pet with their name, gender, body weight, type of pet (has to be specific, not just "Dog" or "Cat")
+    -Schedule a walk
+        Attributes: Pet information, weather information
+        Methods: Set a timestamp on when it is best to take your pet out for a walk
+    -See today's tasks
+        Attributes: tasks that are due today
+        Method: display the current tasks today
+    -Generate a plan based on constraints & priorities
+        Attributes: pet information, all tasks, any constraints & priorities
+        Method: create a plan based on constraints & priorities
 
 **b. Design changes**
 
