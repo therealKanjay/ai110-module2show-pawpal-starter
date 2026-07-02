@@ -4,23 +4,24 @@ You are building **PawPal+**, a Streamlit app that helps a pet owner plan care t
 
 ## Scenario
 
-A busy pet owner needs help staying consistent with pet care. They want an assistant that can:
+A busy pet owner needs help staying consistent with pet care. The assistant should:
 
 - Track pet care tasks (walks, feeding, meds, enrichment, grooming, etc.)
-- Consider constraints (time available, priority, owner preferences)
-- Produce a daily plan and explain why it chose that plan
+- Consider constraints such as available time and task priority
+- Produce a daily plan and explain the reasoning behind it
 
-Your job is to design the system first (UML), then implement the logic in Python, then connect it to the Streamlit UI.
+The current implementation focuses on the core logic in Python and persistence support. The Streamlit UI is still the next integration step.
 
-## What you will build
+## What is implemented
 
-Your final app should:
-
-- Let a user enter basic owner + pet info
-- Let a user add/edit tasks (duration + priority at minimum)
-- Generate a daily schedule/plan based on constraints and priorities
-- Display the plan clearly (and ideally explain the reasoning)
-- Include tests for the most important scheduling behaviors
+- `pawpal_system.py` contains:
+  - `Pet`, `Task`, `Walk`, `Owner`, `ScheduledActivity`, `ActivityPlan`
+  - `PetManager`, `TaskManager`, `WalkScheduler`, `PlanGenerator`, and `PersistenceManager`
+- `TaskManager` supports task creation, completion, and today-only task listing
+- `WalkScheduler` supports weather-based scheduling and per-pet walk plans
+- `PlanGenerator` builds a daily activity plan using constraints, priorities, and available pets
+- `PersistenceManager` saves and loads app state as JSON
+- `test_pawpal_system.py` includes core behavior validation
 
 ## Getting started
 
@@ -28,67 +29,52 @@ Your final app should:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Suggested workflow
-
-1. Read the scenario carefully and identify requirements and edge cases.
-2. Draft a UML diagram (classes, attributes, methods, relationships).
-3. Convert UML into Python class stubs (no logic yet).
-4. Implement scheduling logic in small increments.
-5. Add tests to verify key behaviors.
-6. Connect your logic to the Streamlit UI in `app.py`.
-7. Refine UML so it matches what you actually built.
-
-## 🖥️ Sample Output
-
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
-
-```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
-```
-
-## 🧪 Testing PawPal+
+### Run tests
 
 ```bash
-# Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+python -m pytest -q
 ```
 
-Sample test output:
+Sample output:
 
+```bash
+3 passed
 ```
-# Paste your pytest output here
-```
+
+## Usage notes
+
+- Use `PetManager.addPet()` and `TaskManager.addTask()` to create pets and tasks
+- Use `WalkScheduler.scheduleWalk()` to schedule a pet walk with weather validation
+- Use `PlanGenerator.generatePlan()` to build a daily plan for one or more pets
+- Use `PersistenceManager.save_state()` and `load_state()` to persist pets, tasks, walks, owners, and plans
+
+## 🧪 Current test coverage
+
+The test file covers:
+
+- persistence save/load behavior
+- weather validation in walk scheduling
+- plan generation for multiple tasks
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `PlanGenerator._build_effective_task_list()` | orders by due date, priority, description |
+| Constraint handling | `PlanGenerator.generatePlan()` | supports `earliestStart` and `latestEnd` |
+| Weather validation | `WalkScheduler.scheduleWalk()` | rejects unsafe weather conditions |
+| Persistence | `PersistenceManager` | saves pets, tasks, walks, owners, plans to JSON |
 
 ## 📸 Demo Walkthrough
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
-
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. Add a pet using `PetManager.addPet()`.
+2. Create tasks using `TaskManager.addTask()`.
+3. Schedule walks with `WalkScheduler.scheduleWalk()`.
+4. Build a daily plan with `PlanGenerator.generatePlan()`.
+5. Save or restore state using `PersistenceManager.save_state()` and `load_state()`.
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
